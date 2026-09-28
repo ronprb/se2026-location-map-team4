@@ -48,13 +48,13 @@ const satellite = L.tileLayer(
   }
 );
 
-// Start with satellite imagery.
-satellite.addTo(map);
+// Start with the street map by default.
+street.addTo(map);
 
-// Layer switcher: users can switch between Satellite and Street.
+// Layer switcher: users can switch between Street and Satellite.
 L.control.layers({
-  '🛰️ Satellite': satellite,
-  '🗺️ Street map': street
+  '🗺️ Street map': street,
+  '🛰️ Satellite': satellite
 }, null, {position: 'topright'}).addTo(map);
 
 function popup(p){
