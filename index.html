@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SE2026 — SLS Location Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ integrity="sha256-p4NxAoJBhIINfQ3WZb7zQ9vV3hG6r9h8gkQG4q4j5g0=" crossorigin=""/>
+<style>
+html,body,#map{height:100%;margin:0}
+#status{
+ position:absolute;z-index:1000;top:12px;left:50%;transform:translateX(-50%);
+ background:white;padding:10px 14px;border-radius:10px;
+ box-shadow:0 2px 12px rgba(0,0,0,.22);font:600 14px Arial,sans-serif;
+ max-width:90%;text-align:center
+}
+#locate{
+ position:absolute;z-index:1000;right:14px;bottom:28px;
+ border:0;border-radius:50%;width:52px;height:52px;
+ background:white;box-shadow:0 2px 12px rgba(0,0,0,.25);
+ font-size:24px;cursor:pointer
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="status">Requesting your location…</div>
+<button id="locate" title="Center on my position">⌖</button>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+ integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+const polygons = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[140.688256842,-2.58308108499995],[140.688381667,-2.58459666699998],[140.687478333,-2.58734],[140.686293333,-2.58831666599997],[140.68498474,-2.58966714899998],[140.683808687,-2.59088084999997],[140.682883888,-2.59183525399994],[140.682705171,-2.59201969199995],[140.682086691,-2.59159510199993],[140.682086242,-2.59159479399994],[140.68197052,-2.59151534999996],[140.681202167,-2.59096364899995],[140.68093658,-2.59077294999997],[140.68040794,-2.59039336999996],[140.68024427,-2.59027991699998],[140.679111624,-2.58949478799997],[140.67910894,-2.58692057299993],[140.679806666,-2.58488333399993],[140.680248441,-2.58352132299996],[140.680251081,-2.58352746199995],[140.688255587,-2.58308012399994],[140.688256842,-2.58308108499995]]]]},"properties":{"idsls":"94710300020003","idsubsls":"9471030002000300","nmsls":"RT 003 RW 001","nmdesa":"ENTROP","nmkec":"JAYAPURA SELATAN"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[140.688115288,-2.59120839399997],[140.687511433,-2.59114234699996],[140.685900805,-2.59124625799997],[140.685160436,-2.59137614799994],[140.683808687,-2.59088084999997],[140.68498474,-2.58966714899998],[140.686293333,-2.58831666599997],[140.687478333,-2.58734],[140.688381667,-2.58459666699998],[140.688256842,-2.58308108499995],[140.693181667,-2.58685260999995],[140.694608165,-2.58850244799993],[140.694608196,-2.58850248399996],[140.695161667,-2.58914260999996],[140.695618866,-2.58981594999994],[140.695611822,-2.58979129899996],[140.695618866,-2.58980167299996],[140.6956242,-2.58982033999997],[140.69553061,-2.58991392999997],[140.69538502,-2.58994512999993],[140.69526024,-2.58997631999995],[140.69519784,-2.58991392999997],[140.69509386,-2.59001791999998],[140.69498987,-2.59009070999997],[140.69491708,-2.59014269999994],[140.69478189,-2.59010110999998],[140.69481309,-2.59019469999993],[140.69476109,-2.59030907999994],[140.6946571,-2.59030907999994],[140.69458431,-2.59031947999994],[140.69449072,-2.59034027999997],[140.69438673,-2.59036107999998],[140.69434514,-2.59044426999998],[140.69428275,-2.59040267999995],[140.69419955,-2.59046506999994],[140.69411636,-2.59049625999996],[140.69404357,-2.59052745999998],[140.69396038,-2.59053785999993],[140.69389799,-2.59062104999993],[140.6938148,-2.59056905999995],[140.69373161,-2.59062104999993],[140.69364842,-2.59058984999997],[140.69366921,-2.59070423999998],[140.69367961,-2.59082902999995],[140.69361722,-2.59089141999994],[140.69354443,-2.59105779999994],[140.69347164,-2.59113058999998],[140.69356523,-2.59118258999997],[140.69367961,-2.59124497999994],[140.69364842,-2.59133856999994],[140.69352363,-2.59128657999997],[140.69344044,-2.59133856999994],[140.69338845,-2.59148414999993],[140.69334685,-2.59160893999997],[140.69328446,-2.59172332999998],[140.69335725,-2.59168172999996],[140.69343004,-2.59173372999993],[140.69347164,-2.59187930999997],[140.69351323,-2.59195209999996],[140.69359642,-2.59193129999994],[140.69364842,-2.59201449999994],[140.69374201,-2.59205608999998],[140.6938252,-2.59206648999998],[140.69388759,-2.59216007999993],[140.69387719,-2.59227446999996],[140.693794,-2.59243044999993],[140.69365882,-2.59249283999998],[140.69352363,-2.59250323999993],[140.69329486,-2.59253443999996],[140.69309728,-2.59255523999997],[140.6929413,-2.59256562999997],[140.69281651,-2.59253443999996],[140.69267093,-2.59254483999997],[140.69253574,-2.59247203999996],[140.69245255,-2.59239924999997],[140.69237976,-2.59231605999997],[140.692015136,-2.59108462999995],[140.688918333,-2.59043833299995],[140.68820324,-2.59080861199994],[140.688115288,-2.59120839399997]]]]},"properties":{"idsls":"94710300020004","idsubsls":"9471030002000400","nmsls":"RT 001 RW 002","nmdesa":"ENTROP","nmkec":"JAYAPURA SELATAN"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[140.674313409,-2.58096641699995],[140.676392535,-2.58080648399994],[140.677046528,-2.58081030799997],[140.677929994,-2.58074529099998],[140.678469252,-2.58066497599998],[140.678991602,-2.58059800799993],[140.679692934,-2.58222925499996],[140.678474319,-2.58380542799996],[140.677898728,-2.58361619299996],[140.674844143,-2.58658902499996],[140.67432169,-2.58623619999998],[140.673719545,-2.58582329399997],[140.673733313,-2.58571069599998],[140.673744877,-2.58561611799997],[140.673989557,-2.58361503199996],[140.674313409,-2.58096641699995]]]]},"properties":{"idsls":"94710300020002","idsubsls":"9471030002000200","nmsls":"RT 002 RW 001","nmdesa":"ENTROP","nmkec":"JAYAPURA SELATAN"}}]};
+
+const map = L.map('map', {zoomControl:true});
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 20,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+function popup(p){
+  return `<b>${p.nmsls || 'SLS'}</b><br>
+  Kelurahan/Desa: ${p.nmdesa || '-'}<br>
+  Kecamatan: ${p.nmkec || '-'}<br>
+  ID SLS: ${p.idsubsls || p.idsls || '-'}`;
+}
+
+const layer = L.geoJSON(polygons, {
+  style: {color:'#d32f2f', weight:3, fillOpacity:0.15},
+  onEachFeature: (feature, l) => {
+    l.bindPopup(popup(feature.properties));
+  }
+}).addTo(map);
+
+map.fitBounds(layer.getBounds(), {padding:[30,30]});
+
+let positionMarker = null;
+let accuracyCircle = null;
+let lastPosition = null;
+
+function updatePosition(pos){
+  lastPosition = pos;
+  const lat = pos.coords.latitude;
+  const lon = pos.coords.longitude;
+  const acc = pos.coords.accuracy || 0;
+
+  if (!positionMarker){
+    positionMarker = L.circleMarker([lat,lon], {
+      radius:8, color:'#1565c0', weight:3,
+      fillColor:'#2196f3', fillOpacity:1
+    }).addTo(map).bindPopup("Your current position");
+  } else {
+    positionMarker.setLatLng([lat,lon]);
+  }
+
+  if (!accuracyCircle){
+    accuracyCircle = L.circle([lat,lon], {
+      radius:acc, color:'#1976d2', weight:1, fillOpacity:0.08
+    }).addTo(map);
+  } else {
+    accuracyCircle.setLatLng([lat,lon]).setRadius(acc);
+  }
+
+  document.getElementById('status').textContent =
+    `📍 Your position • GPS accuracy ±${Math.round(acc)} m`;
+
+  // Initial location: center on the user. Later GPS updates do not constantly
+  // move the map so the user can inspect the polygons.
+  if (!window.initialCentered){
+    map.setView([lat,lon], Math.max(map.getZoom(),16));
+    window.initialCentered = true;
+  }
+}
+
+function locationError(err){
+  document.getElementById('status').textContent =
+    'Location unavailable — allow location permission in your browser.';
+}
+
+if (navigator.geolocation){
+  navigator.geolocation.watchPosition(updatePosition, locationError, {
+    enableHighAccuracy:true,
+    maximumAge:5000,
+    timeout:15000
+  });
+} else {
+  document.getElementById('status').textContent =
+    'This browser does not support location.';
+}
+
+document.getElementById('locate').onclick = () => {
+  if (lastPosition){
+    map.setView(
+      [lastPosition.coords.latitude, lastPosition.coords.longitude],
+      Math.max(map.getZoom(),17)
+    );
+  } else if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(updatePosition, locationError,
+      {enableHighAccuracy:true, timeout:15000});
+  }
+};
+</script>
+</body>
+</html>
